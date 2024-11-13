@@ -2,7 +2,7 @@ name: Star Rail Check-in
 
 on:
   schedule:
-    - cron: "17 11 * * *" # This will run at 11:17 AM UTC, which is 5:17 PM IST
+    - cron: "19 11 * * *" # This will run at 11:17 AM UTC, which is 5:17 PM IST
 
   workflow_dispatch:
 
