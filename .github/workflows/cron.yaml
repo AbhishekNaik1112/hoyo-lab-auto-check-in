@@ -2,7 +2,7 @@ name: Star Rail Check-in
 
 on:
   schedule:
-    - cron: '4 17 * * *' 
+    - cron: '45 1 * * *' 
   workflow_dispatch:  
 
 jobs:
