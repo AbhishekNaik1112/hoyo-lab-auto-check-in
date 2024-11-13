@@ -55,7 +55,7 @@ class StarRailGame {
   }
 
   async fetchWithRetry(url, options, retries = 3) {
-    options.agent = this.agent; 
+    options.agent = this.agent;
     for (let i = 0; i < retries; i++) {
       try {
         const response = await fetch(url, options);
@@ -75,7 +75,7 @@ class StarRailGame {
     const url = `${this.constants.url.info}?act_id=${this.constants.ACT_ID}`;
     const options = {
       headers: { Cookie: account.value },
-      agent: this.agent, 
+      agent: this.agent,
     };
     try {
       const body = await this.fetchWithRetry(url, options);
@@ -86,7 +86,6 @@ class StarRailGame {
         },
       };
     } catch (error) {
-      // this.handleError("Error fetching sign info", account, error);
       return { success: false };
     }
   }
@@ -100,7 +99,7 @@ class StarRailGame {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ act_id: this.constants.ACT_ID }),
-      agent: this.agent, 
+      agent: this.agent,
     };
     try {
       const body = await this.fetchWithRetry(url, options);
@@ -118,9 +117,11 @@ class StarRailGame {
 
   async checkAndExecute() {
     const success = [];
+    const failed = [];
     for (const account of this.accounts) {
       if (!account.ltuid) {
         this.handleError(`ltuid_v2 not found in cookie`, account);
+        failed.push(account);
         continue;
       }
 
@@ -134,31 +135,51 @@ class StarRailGame {
         const sign = await this.sign(account);
         if (!sign.success) {
           this.handleError(`Failed to sign in`, account);
+          failed.push(account);
           continue;
         }
 
         console.info(`${this.constants.game}: Successfully checked in.`);
-        success.push({ game: this.constants.game });
+        success.push(account);
       } catch (error) {
         this.handleError(`Error during check-in process`, account, error);
+        failed.push(account);
       }
     }
-    return success;
+    return { success, failed };
   }
 }
 
 async function main() {
   const game = new StarRailGame(STAR_RAIL_CONSTANTS, STAR_RAIL_ACCOUNT.data);
   const result = await game.checkAndExecute();
-  if (result.length > 0 && DISCORD_WEBHOOK) {
+
+  let messageContent = `Daily check-in summary for ${STAR_RAIL_CONSTANTS.game}:\n`;
+
+  if (result.success.length > 0) {
+    messageContent += `\nSuccessfully checked in accounts: ${result.success.map(account => account.name).join(", ")}`;
+  } else {
+    messageContent += `\nNo accounts were successfully checked in.`;
+  }
+
+  if (result.failed.length > 0) {
+    messageContent += `\nFailed accounts: ${result.failed.map(account => account.name).join(", ")}`;
+  }
+
+  if (DISCORD_WEBHOOK) {
     const message = {
-      content: `Daily check-in completed for Star Rail.`,
+      content: messageContent,
     };
-    fetch(DISCORD_WEBHOOK, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(message),
-    });
+    try {
+      await fetch(DISCORD_WEBHOOK, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(message),
+      });
+      console.info("Discord notification sent successfully");
+    } catch (error) {
+      console.error("Error sending Discord notification:", error);
+    }
   }
 }
 
