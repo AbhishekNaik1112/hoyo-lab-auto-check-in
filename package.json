@@ -1,0 +1,19 @@
+{
+  "name": "star-rail-check-in",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.5",
+    "node-fetch": "^3.3.2",
+    "ts-node": "^10.9.2"
+  }
+}

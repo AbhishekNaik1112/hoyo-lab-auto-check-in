@@ -1,0 +1,4 @@
+cron:
+  - schedule: "0 20 * * *"  
+    timezone: "UTC"  
+    command: "node index.js"  
