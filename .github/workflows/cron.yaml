@@ -2,8 +2,9 @@ name: Star Rail Check-in
 
 on:
   schedule:
-    - cron: '13 17 * * *' 
-  workflow_dispatch: 
+    - cron: "17 11 * * *" # This will run at 11:17 AM UTC, which is 5:17 PM IST
+
+  workflow_dispatch:
 
 jobs:
   check_in:
@@ -11,12 +12,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4 
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4  
+        uses: actions/setup-node@v4
         with:
-          node-version: '20' 
+          node-version: "20"
 
       - name: Install dependencies
         run: npm install
@@ -24,5 +25,5 @@ jobs:
       - name: Run the script
         run: node index.js
         env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}  
-          STAR_RAIL_ACCOUNT: ${{ secrets.STAR_RAIL_ACCOUNT }} 
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          STAR_RAIL_ACCOUNT: ${{ secrets.STAR_RAIL_ACCOUNT }}
